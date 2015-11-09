@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 import os
 import sqlite3
+import re
 
 # contactos = []
 conexion = sqlite3.connect('agenda.s3db')
@@ -19,10 +21,43 @@ def addContact():
     limpiar()
     print "Agregando Nuevo Contacto"
     contacto = Contacto()
-    contacto.nombre = raw_input("Digite el nombre: ")
-    contacto.apellido = raw_input("Digite el apellido: ")
-    contacto.telefono = raw_input("Digite el telefono: ")
-    contacto.email = raw_input("Digite el email: ")
+
+    pattern = re.compile("^([a-z ñáéíóú]{2,60})$")
+    validName = False
+    while validName == False:
+        contacto.nombre = raw_input("Digite el nombre: ")
+        if pattern.match(contacto.nombre) != None:
+            validName = True
+        else:
+            print "Nombre Incorrecto. Debe contener solo letras"
+
+    validLastName = False
+    while validLastName == False:
+        contacto.apellido = raw_input("Digite el apellido: ")
+        if pattern.match(contacto.apellido) != None:
+            validLastName = True
+        else:
+            print "Apellido Incorrecto. Debe contener solo letras"
+
+
+    pattern = re.compile("^\+?\d{1,3}?[- .]?\(?(?:\d{2,3})\)?[- .]?\d\d\d[- .]?\d\d\d\d$")
+    validPhone = False
+    while validPhone == False:
+        contacto.telefono = raw_input("Digite el telefono: ")
+        if pattern.match(contacto.telefono) != None:
+            validPhone = True
+        else:
+            print "Numero de Telefono Incorrecto. Debe contener 9 digitos"
+
+    pattern = re.compile("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$")
+    validMail = False
+    while validMail == False:
+        contacto.email = raw_input("Digite el email: ")
+        if pattern.match(contacto.email) != None:
+            validMail = True
+        else:
+            print "Direccion email invalida"
+
     reg = (contacto.nombre, contacto.apellido, contacto.telefono, contacto.email)
     cursor.execute('INSERT INTO Contactos (nombre, apellido, telefono, email) VALUES(?, ?, ?, ?)', reg)
     conexion.commit()
